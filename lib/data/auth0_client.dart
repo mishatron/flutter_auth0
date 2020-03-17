@@ -98,7 +98,8 @@ class Auth0Client {
   /// Param [String] token user's access token
   /// Returns [Future] with user info
   Future<dynamic> getUserInfo() async {
-    return await dioWrapper.get('/userinfo');
+    var res = await dioWrapper.get('/userinfo');
+    return res.data;
   }
 
   /// Request an email with instructions to change password of a user
@@ -109,7 +110,9 @@ class Auth0Client {
   Future<dynamic> resetPassword(dynamic params) async {
     assert(params['email'] != null && params['connection'] != null);
     var payload = Map.from(params)..addAll({'client_id': this.clientId});
-    return dioWrapper.post('/dbconnections/change_password', body: payload);
+    var res =
+        await dioWrapper.post('/dbconnections/change_password', body: payload);
+    return res.data;
   }
 
   /// Performs creating user with specified values
@@ -145,7 +148,8 @@ class Auth0Client {
         'token': params['refreshToken'],
         'client_id': this.clientId,
       });
-    return dioWrapper.post('/oauth/revoke', body: payload);
+    var res = await dioWrapper.post('/oauth/revoke', body: payload);
+    return res.data;
   }
 
   /// Exchanges a code obtained via /authorize (w/PKCE) for the user's tokens
@@ -174,7 +178,7 @@ class Auth0Client {
   /// @returns a [Future]
   /// [ref link]: https://auth0.com/docs/api/authentication#logout
   Future<dynamic> logout() async {
-    Map params = Map();
+    Map<String, dynamic> params = Map<String, dynamic>();
     params['auth0Client'] = dioWrapper.encodedTelemetry();
     var res = await dioWrapper.get('/v2/logout', params: params);
     return res.data;
