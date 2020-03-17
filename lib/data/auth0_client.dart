@@ -112,6 +112,7 @@ class Auth0Client {
     return dioWrapper.post('/dbconnections/change_password', body: payload);
   }
 
+  /// Performs creating user with specified values
   /// @param [Object] params create user params
   /// @param [String] params.email user's email
   /// @param [String] - [params.username] user's username

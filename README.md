@@ -1,14 +1,25 @@
 # auth0
 
-A new Flutter package.
+Flutter package for authentication using Auth0 API.Contains basic set of methods like passwordRealm, getUser, logout etc.
 
-## Getting Started
+## Usage
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+```
+Auth0Client(clientId, baseUrl,
+        connectTimeout: 10000, sendTimeout: 10000, receiveTimeout: 60000);
+```
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+## Available methods
+
+
+`updateToken` - Updates current access token for Auth0 connection  
+`authorizeUrl` - Builds the full authorize endpoint url in the Authorization Server (AS) with given parameters.  
+`passwordRealm` - Performs Auth with user credentials using the Password Realm Grant  
+`refreshToken` - Obtains new tokens using the Refresh Token obtained during Auth (requesting offline_access scope)  
+`getUserInfo` - Returns user information using an access token  
+`resetPassword` - Requests an email with instructions to change password of a user  
+`logout` - Makes logout API call  
+`createUser` - Performs creating user with specified values  
+`revoke` - Revokes an issued refresh token  
+`exchange` - Exchanges a code obtained via /authorize (w/PKCE) for the user's tokens
+
