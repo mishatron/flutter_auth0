@@ -3,28 +3,33 @@ part of auth0;
 class Auth0Client {
   final DioWrapper dioWrapper = DioWrapper();
   final String clientId;
-  final String url;
+  final String clientSecret;
+  final String domain;
 
   int connectTimeout;
   int sendTimeout;
   int receiveTimeout;
 
-  Auth0Client(this.clientId, this.url,
-      {String accessToken,
-      this.connectTimeout,
-      this.sendTimeout,
-      this.receiveTimeout}) {
+  Auth0Client({
+    this.clientId,
+    this.clientSecret,
+    this.domain,
+    String accessToken,
+    this.connectTimeout,
+    this.sendTimeout,
+    this.receiveTimeout,
+  }) {
     assert(clientId != null);
-    assert(url != null);
+    assert(domain != null);
 
     dioWrapper.configure(
-        url, connectTimeout, sendTimeout, receiveTimeout, accessToken);
+        'https://$domain', connectTimeout, sendTimeout, receiveTimeout, accessToken);
   }
 
   /// Updates current access token for Auth0 connection
   void updateToken(String newAccessToken) {
     dioWrapper.configure(
-        url, connectTimeout, sendTimeout, receiveTimeout, newAccessToken);
+        'https://$domain', connectTimeout, sendTimeout, receiveTimeout, newAccessToken);
   }
 
   /// Builds the full authorize endpoint url in the Authorization Server (AS) with given parameters.
@@ -50,6 +55,31 @@ class Auth0Client {
       query: Map.from({'client_id': this.clientId})..addAll(query),
       includeTelemetry: true,
     );
+  }
+
+  /// Performs Auth with user credentials using the Password Realm Grant
+  /// [params] to send realm parameters
+  /// @param [String] params.username user's username or email
+  /// @param [String] params.password user's password
+  /// @param [String] params.realm name of the Realm where to Auth (or connection name)
+  /// @param [String] - [params.audience] identifier of Resource Server (RS) to be included as audience (aud claim) of the issued access token
+  /// @param [String] - [params.scope] scopes requested for the issued tokens. e.g. openid profile
+  /// @returns a [Future] with [Auth0User]
+  /// [ref link]: https://auth0.com/docs/api-auth/grant/password#realm-support
+  Future<Auth0User> passwordGrant(Map<String, String> params) async {
+    assert(params['username'] != null && params['password'] != null);
+
+    var payload = {
+      ...params,
+        'client_id': this.clientId,
+        'client_secret': this.clientSecret,
+        'grant_type': params['realm'] != null
+            ? 'http://auth0.com/oauth/grant-type/password-realm'
+            : 'password'
+      };
+
+    Response res = await dioWrapper.post('/oauth/token', body: payload);
+    return Auth0User.fromMap(res.data as Map);
   }
 
   /// Performs Auth with user credentials using the Password Realm Grant
