@@ -75,6 +75,51 @@ class Auth0Client {
     Response res = await dioWrapper.post('/oauth/token', body: payload);
     return Auth0User.fromMap(res.data);
   }
+  ///POST https://YOUR_DOMAIN/passwordless/start
+// Content-Type: application/json
+// {
+//   "client_id": "YOUR_CLIENT_ID",
+//   "client_secret": "YOUR_CLIENT_SECRET", // for web applications
+//   "connection": "email|sms",
+//   "email": "EMAIL", //set for connection=email
+//   "phone_number": "PHONE_NUMBER", //set for connection=sms
+//   "send": "link|code", //if left null defaults to link
+//   "authParams": { // any authentication parameters that you would like to add
+//     "scope": "openid",
+//     "state": "YOUR_STATE"
+//   }
+// }
+  Future<Auth0User> sendOtpCode (dynamic params) async {
+    assert(params['phone_number'] != null);
+
+    var payload = Map.from(params)
+      ..addAll({
+        'client_id': this.clientId,
+        'connection': "sms",
+        'send': "code",
+      });
+
+    Response res = await dioWrapper.post('/passwordless/start', body: payload);
+    return Auth0User.fromMap(res.data);
+  }
+
+
+
+  Future<Auth0User> phoneVerificationOtp(dynamic params) async {
+    assert(params['username'] != null &&
+        params['code'] != null);
+
+    var payload = Map.from(params)
+      ..addAll({
+        'client_id': this.clientId,
+        'realm': "sms",
+        'grant_type': 'http://auth0.com/oauth/grant-type/passwordless/otp',
+      });
+
+    Response res = await dioWrapper.post('/oauth/token', body: payload);
+    return Auth0User.fromMap(res.data);
+  }
+  
 
   /// Obtain new tokens using the Refresh Token obtained during Auth (requesting offline_access scope)
   /// @param [Object] params refresh token params
@@ -123,10 +168,15 @@ class Auth0Client {
   /// @param [String] params.connection name of the database connection where to create the user
   /// @param [String] - [params.metadata] additional user information that will be stored in user_metadata
   /// @returns [Future]
-  Future<dynamic> createUser(dynamic params) async {
-    assert(params['email'] != null &&
-        params['password'] != null &&
-        params['connection'] != null);
+  Future<dynamic> createUser(dynamic params,{isEmail = true}) async {
+    if(isEmail)
+      {
+        assert(params['email'] != null &&
+            params['password'] != null &&
+            params['connection'] != null);
+      }else{
+
+    }
     var payload = Map.from(params)..addAll({'client_id': this.clientId});
     if (params['metadata'] != null)
       payload..addAll({'user_metadata': params['metadata']});
