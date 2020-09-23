@@ -8,7 +8,8 @@ class DioWrapper {
   String scheme = "";
 
   void configure(String baseUrl, int connectTimeout, int sendTimeout,
-      int receiveTimeout, String accessToken) {
+      int receiveTimeout, String accessToken, Auth0Client auth0client,
+      {bool useTokenInterceptor = true, bool useLoggerInterceptor = false}) {
     var parsed = Uri.parse(baseUrl);
     scheme = parsed.scheme;
     host = parsed.host;
@@ -18,16 +19,22 @@ class DioWrapper {
       ..connectTimeout = connectTimeout
       ..sendTimeout = sendTimeout
       ..receiveTimeout = receiveTimeout;
-    if (accessToken != null) {
+    if (useLoggerInterceptor) {
+      dio
+        ..interceptors.add(PrettyDioLogger(
+            requestHeader: true,
+            requestBody: true,
+            responseBody: true,
+            responseHeader: true,
+            error: true,
+            compact: true,
+            maxWidth: 90));
+    }
+
+    if (useTokenInterceptor) {
       dio
         ..interceptors
-            .add(InterceptorsWrapper(onRequest: (RequestOptions options) {
-          dio.interceptors.requestLock.lock();
-          String token = "Bearer $accessToken";
-          options.headers["Authorization"] = token;
-          dio.interceptors.requestLock.unlock();
-          return options; //continue
-        }));
+            .add(TokenInterceptor(dio, auth0client));
     }
   }
 

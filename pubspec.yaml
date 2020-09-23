@@ -7,7 +7,9 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
-  dio: ^3.0.9
+  dio: ^3.0.10
+  pretty_dio_logger: ^1.1.1
+  shared_preferences: ^0.5.10
   flutter:
     sdk: flutter
 
