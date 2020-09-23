@@ -9,6 +9,8 @@ class Auth0Client {
   int connectTimeout;
   int sendTimeout;
   int receiveTimeout;
+  bool userTokenInterceptor = false;
+  bool userLoggerInterceptor = false;
 
   Auth0Client({
     this.clientId,
@@ -18,18 +20,21 @@ class Auth0Client {
     this.connectTimeout,
     this.sendTimeout,
     this.receiveTimeout,
+      this.userLoggerInterceptor,
+      this.userTokenInterceptor
   }) {
     assert(clientId != null);
     assert(domain != null);
 
     dioWrapper.configure(
-        'https://$domain', connectTimeout, sendTimeout, receiveTimeout, accessToken);
+        'https://$domain', connectTimeout, sendTimeout, receiveTimeout, accessToken, this,
+        useLoggerInterceptor: userLoggerInterceptor,
+        useTokenInterceptor: userTokenInterceptor);
   }
 
   /// Updates current access token for Auth0 connection
   void updateToken(String newAccessToken) {
-    dioWrapper.configure(
-        'https://$domain', connectTimeout, sendTimeout, receiveTimeout, newAccessToken);
+    dioWrapper.configure('https://$domain', connectTimeout, sendTimeout, receiveTimeout, newAccessToken, this);
   }
 
   /// Builds the full authorize endpoint url in the Authorization Server (AS) with given parameters.
@@ -106,6 +111,39 @@ class Auth0Client {
     return Auth0User.fromMap(res.data);
   }
 
+  /// Performs sending sms code on phone number
+  Future<bool> sendOtpCode(dynamic params) async {
+    assert(params['phone_number'] != null);
+
+    var payload = Map.from(params)
+      ..addAll({
+        'client_id': this.clientId,
+        'connection': "sms",
+        'send': "code",
+        "authParams": {"scope": "offline_access", "grant_type": "refresh_token"}
+      });
+
+    await dioWrapper.post('/passwordless/start', body: payload);
+    return true;
+  }
+
+  Future<Auth0User> phoneVerificationOtp(dynamic params) async {
+    assert(params['username'] != null && params['otp'] != null);
+
+    var payload = Map.from(params)
+      ..addAll({
+        'client_id': this.clientId,
+        'realm': "sms",
+        'grant_type': 'http://auth0.com/oauth/grant-type/passwordless/otp',
+      });
+
+    Response res = await dioWrapper.post('/oauth/token', body: payload);
+    Auth0User user = Auth0User.fromMap(res.data);
+    await Auth0PreferenceManager.singleton.setAccessToken(user.accessToken);
+    await Auth0PreferenceManager.singleton.setRefreshToken(user.refreshToken);
+    return user;
+  }
+
   /// Obtain new tokens using the Refresh Token obtained during Auth (requesting offline_access scope)
   /// @param [Object] params refresh token params
   /// @param [String] params.refreshToken user's issued refresh token
@@ -153,10 +191,12 @@ class Auth0Client {
   /// @param [String] params.connection name of the database connection where to create the user
   /// @param [String] - [params.metadata] additional user information that will be stored in user_metadata
   /// @returns [Future]
-  Future<dynamic> createUser(dynamic params) async {
-    assert(params['email'] != null &&
-        params['password'] != null &&
-        params['connection'] != null);
+  Future<dynamic> createUser(dynamic params, {isEmail = true}) async {
+    if (isEmail) {
+      assert(params['email'] != null &&
+          params['password'] != null &&
+          params['connection'] != null);
+    } else {}
     var payload = Map.from(params)..addAll({'client_id': this.clientId});
     if (params['metadata'] != null)
       payload..addAll({'user_metadata': params['metadata']});
