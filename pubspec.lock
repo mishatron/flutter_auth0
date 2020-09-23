@@ -171,6 +171,7 @@ packages:
     source: hosted
     version: "3.0.13"
   shared_preferences:
+
     dependency: "direct main"
     description:
       name: shared_preferences

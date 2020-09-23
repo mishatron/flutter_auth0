@@ -3,7 +3,8 @@ part of auth0;
 class Auth0Client {
   final DioWrapper dioWrapper = DioWrapper();
   final String clientId;
-  final String url;
+  final String clientSecret;
+  final String domain;
 
   int connectTimeout;
   int sendTimeout;
@@ -11,26 +12,29 @@ class Auth0Client {
   bool userTokenInterceptor = false;
   bool userLoggerInterceptor = false;
 
-  Auth0Client(this.clientId, this.url,
-      {String accessToken,
-      this.connectTimeout,
-      this.sendTimeout,
-      this.receiveTimeout,
+  Auth0Client({
+    this.clientId,
+    this.clientSecret,
+    this.domain,
+    String accessToken,
+    this.connectTimeout,
+    this.sendTimeout,
+    this.receiveTimeout,
       this.userLoggerInterceptor,
-      this.userTokenInterceptor}) {
+      this.userTokenInterceptor
+  }) {
     assert(clientId != null);
-    assert(url != null);
+    assert(domain != null);
 
     dioWrapper.configure(
-        url, connectTimeout, sendTimeout, receiveTimeout, accessToken, this,
+        'https://$domain', connectTimeout, sendTimeout, receiveTimeout, accessToken, this,
         useLoggerInterceptor: userLoggerInterceptor,
         useTokenInterceptor: userTokenInterceptor);
   }
 
   /// Updates current access token for Auth0 connection
   void updateToken(String newAccessToken) {
-    dioWrapper.configure(
-        url, connectTimeout, sendTimeout, receiveTimeout, newAccessToken, this);
+    dioWrapper.configure('https://$domain', connectTimeout, sendTimeout, receiveTimeout, newAccessToken, this);
   }
 
   /// Builds the full authorize endpoint url in the Authorization Server (AS) with given parameters.
@@ -67,6 +71,31 @@ class Auth0Client {
   /// @param [String] - [params.scope] scopes requested for the issued tokens. e.g. openid profile
   /// @returns a [Future] with [Auth0User]
   /// [ref link]: https://auth0.com/docs/api-auth/grant/password#realm-support
+  Future<Auth0User> passwordGrant(Map<String, String> params) async {
+    assert(params['username'] != null && params['password'] != null);
+
+    var payload = {
+      ...params,
+        'client_id': this.clientId,
+        'client_secret': this.clientSecret,
+        'grant_type': params['realm'] != null
+            ? 'http://auth0.com/oauth/grant-type/password-realm'
+            : 'password'
+      };
+
+    Response res = await dioWrapper.post('/oauth/token', body: payload);
+    return Auth0User.fromMap(res.data as Map);
+  }
+
+  /// Performs Auth with user credentials using the Password Realm Grant
+  /// [params] to send realm parameters
+  /// @param [String] params.username user's username or email
+  /// @param [String] params.password user's password
+  /// @param [String] params.realm name of the Realm where to Auth (or connection name)
+  /// @param [String] - [params.audience] identifier of Resource Server (RS) to be included as audience (aud claim) of the issued access token
+  /// @param [String] - [params.scope] scopes requested for the issued tokens. e.g. openid profile
+  /// @returns a [Future] with [Auth0User]
+  /// [ref link]: https://auth0.com/docs/api-auth/grant/password#realm-support
   Future<Auth0User> passwordRealm(dynamic params) async {
     assert(params['username'] != null &&
         params['password'] != null &&
@@ -82,20 +111,7 @@ class Auth0Client {
     return Auth0User.fromMap(res.data);
   }
 
-  ///POST https://YOUR_DOMAIN/passwordless/start
-// Content-Type: application/json
-// {
-//   "client_id": "YOUR_CLIENT_ID",
-//   "client_secret": "YOUR_CLIENT_SECRET", // for web applications
-//   "connection": "email|sms",
-//   "email": "EMAIL", //set for connection=email
-//   "phone_number": "PHONE_NUMBER", //set for connection=sms
-//   "send": "link|code", //if left null defaults to link
-//   "authParams": { // any authentication parameters that you would like to add
-//     "scope": "openid",
-//     "state": "YOUR_STATE"
-//   }
-// }
+  /// Performs sending sms code on phone number
   Future<bool> sendOtpCode(dynamic params) async {
     assert(params['phone_number'] != null);
 
