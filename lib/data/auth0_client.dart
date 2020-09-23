@@ -134,11 +134,11 @@ class Auth0Client {
     return true;
   }
 
-  /// Performs sending sms code on phone number
+  /// Performs verification of phone number
   /// [params] to send parameters
   /// @param [String] params.otp - code form sms or @param [String] params.username
   /// @returns a [Future] with [Auth0User]
-  Future<Auth0User> phoneVerificationOtp(dynamic params) async {
+  Future<Auth0User> verifyPhoneWithOTP(dynamic params) async {
     assert(params['username'] != null && params['otp'] != null);
 
     var payload = Map.from(params)

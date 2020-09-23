@@ -1,8 +1,13 @@
+## [1.2.1] - 23.09.2020.
+
+* Fixed documentation
+
+
 ## [1.2.0] - 23.09.2020.
 
 * Added [passwordGrant] method
 * Added [sendOtpCode] method for passwordless (OTP) auth
-* Added [phoneVerificationOtp] method to confirm auth via OTP
+* Added [verifyPhoneWithOTP] method to confirm auth via OTP
 * Added token interceptor for dio to automatically refresh token if needed. Tokens are saved via shared preferences
 * Added [Auth0UnauthorizedException] that throws when no token or it can not be refreshed
 
