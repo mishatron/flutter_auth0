@@ -20,21 +20,24 @@ class Auth0Client {
     this.connectTimeout,
     this.sendTimeout,
     this.receiveTimeout,
-      this.userLoggerInterceptor,
-      this.userTokenInterceptor
+    this.userLoggerInterceptor,
+    this.userTokenInterceptor
   }) {
     assert(clientId != null);
     assert(domain != null);
 
     dioWrapper.configure(
-        'https://$domain', connectTimeout, sendTimeout, receiveTimeout, accessToken, this,
+        'https://$domain', connectTimeout, sendTimeout, receiveTimeout,
+        accessToken, this,
         useLoggerInterceptor: userLoggerInterceptor,
         useTokenInterceptor: userTokenInterceptor);
   }
 
   /// Updates current access token for Auth0 connection
   void updateToken(String newAccessToken) {
-    dioWrapper.configure('https://$domain', connectTimeout, sendTimeout, receiveTimeout, newAccessToken, this);
+    dioWrapper.configure(
+        'https://$domain', connectTimeout, sendTimeout, receiveTimeout,
+        newAccessToken, this);
   }
 
   /// Builds the full authorize endpoint url in the Authorization Server (AS) with given parameters.
@@ -57,7 +60,8 @@ class Auth0Client {
       });
     return dioWrapper.url(
       '/authorize',
-      query: Map.from({'client_id': this.clientId})..addAll(query),
+      query: Map.from({'client_id': this.clientId})
+        ..addAll(query),
       includeTelemetry: true,
     );
   }
@@ -76,12 +80,12 @@ class Auth0Client {
 
     var payload = {
       ...params,
-        'client_id': this.clientId,
-        'client_secret': this.clientSecret,
-        'grant_type': params['realm'] != null
-            ? 'http://auth0.com/oauth/grant-type/password-realm'
-            : 'password'
-      };
+      'client_id': this.clientId,
+      'client_secret': this.clientSecret,
+      'grant_type': params['realm'] != null
+          ? 'http://auth0.com/oauth/grant-type/password-realm'
+          : 'password'
+    };
 
     Response res = await dioWrapper.post('/oauth/token', body: payload);
     return Auth0User.fromMap(res.data as Map);
@@ -112,6 +116,9 @@ class Auth0Client {
   }
 
   /// Performs sending sms code on phone number
+  /// [params] to send parameters
+  /// @param [String] params.phone_number user's phone number
+  /// @returns a [Future] with [bool]
   Future<bool> sendOtpCode(dynamic params) async {
     assert(params['phone_number'] != null);
 
@@ -127,6 +134,10 @@ class Auth0Client {
     return true;
   }
 
+  /// Performs sending sms code on phone number
+  /// [params] to send parameters
+  /// @param [String] params.otp - code form sms or @param [String] params.username
+  /// @returns a [Future] with [Auth0User]
   Future<Auth0User> phoneVerificationOtp(dynamic params) async {
     assert(params['username'] != null && params['otp'] != null);
 
@@ -177,9 +188,10 @@ class Auth0Client {
   /// @returns [Future]
   Future<dynamic> resetPassword(dynamic params) async {
     assert(params['email'] != null && params['connection'] != null);
-    var payload = Map.from(params)..addAll({'client_id': this.clientId});
+    var payload = Map.from(params)
+      ..addAll({'client_id': this.clientId});
     var res =
-        await dioWrapper.post('/dbconnections/change_password', body: payload);
+    await dioWrapper.post('/dbconnections/change_password', body: payload);
     return res.data;
   }
 
@@ -197,7 +209,8 @@ class Auth0Client {
           params['password'] != null &&
           params['connection'] != null);
     } else {}
-    var payload = Map.from(params)..addAll({'client_id': this.clientId});
+    var payload = Map.from(params)
+      ..addAll({'client_id': this.clientId});
     if (params['metadata'] != null)
       payload..addAll({'user_metadata': params['metadata']});
     var res = await dioWrapper.post(

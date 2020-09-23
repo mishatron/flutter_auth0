@@ -13,7 +13,8 @@ class Auth0PreferenceManager {
 
   Future<void> clear() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    await prefs.remove(_kAccessToken);
+    await prefs.remove(_kRefreshToken);
   }
 
   Future<String> getAccessToken() async {

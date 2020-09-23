@@ -13,12 +13,12 @@ class TokenInterceptor extends InterceptorsWrapper {
   onRequest(RequestOptions options) async {
     String accessToken = await Auth0PreferenceManager().getAccessToken();
 
-    if (accessToken == null) {
+    if (accessToken != null && accessToken.isNotEmpty) {
+      options.headers["Authorization"] = "Bearer $accessToken";
+    } else {
       await Auth0PreferenceManager().clear();
-      throw Auth0UnauthorizedException(message: "Token not found");
     }
 
-    options.headers["Authorization"] = "Bearer $accessToken";
     return options;
   }
 
@@ -35,7 +35,9 @@ class TokenInterceptor extends InterceptorsWrapper {
       String accessToken = await Auth0PreferenceManager().getAccessToken();
 
       String token = "Bearer $accessToken";
-      if (token != options.headers["Authorization"]) {
+      if (token != options.headers["Authorization"] &&
+          token != null &&
+          token.isNotEmpty) {
         options.headers["Authorization"] = token;
         return previous.request(options.path, options: options);
       }
@@ -47,14 +49,25 @@ class TokenInterceptor extends InterceptorsWrapper {
 
       try {
         String refreshToken = await Auth0PreferenceManager().getRefreshToken();
-        await auth0client.refreshToken(refreshToken);
+        if (refreshToken != null && refreshToken.isNotEmpty) {
+          var response = await auth0client.refreshToken(refreshToken);
+          if (response["access_token"] != null)
+            await Auth0PreferenceManager()
+                .setAccessToken(response["access_token"]);
 
-        previous.unlock();
-        previous.interceptors.responseLock.unlock();
-        previous.interceptors.errorLock.unlock();
+          if (response["refresh_token"])
+            await Auth0PreferenceManager()
+                .setRefreshToken(response["refresh_token"]);
 
-        // repeat the request with a new options
-        return previous.request(options.path, options: options);
+          previous.unlock();
+          previous.interceptors.responseLock.unlock();
+          previous.interceptors.errorLock.unlock();
+          // repeat the request with a new options
+          return previous.request(options.path, options: options);
+        } else {
+          await Auth0PreferenceManager().clear();
+          throw Auth0UnauthorizedException(message: "No refresh token found");
+        }
       } catch (e) {
         await Auth0PreferenceManager().clear();
         throw Auth0UnauthorizedException(message: e.toString());
