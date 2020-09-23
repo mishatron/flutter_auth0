@@ -1,6 +1,6 @@
 name: auth0
 description: Dart package for authentication using Auth0 API. Contains basic set of methods like passwordRealm, getUser, logout etc.
-version: 1.2.0
+version: 1.2.1
 homepage: https://github.com/mishatron/flutter_auth0.git
 
 environment:
