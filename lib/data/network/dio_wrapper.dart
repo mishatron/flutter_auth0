@@ -9,7 +9,7 @@ class DioWrapper {
 
   void configure(String baseUrl, int connectTimeout, int sendTimeout,
       int receiveTimeout, String accessToken, Auth0Client auth0client,
-      {bool useTokenInterceptor = true, bool useLoggerInterceptor = false}) {
+      {bool useLoggerInterceptor = false}) {
     var parsed = Uri.parse(baseUrl);
     scheme = parsed.scheme;
     host = parsed.host;
@@ -29,12 +29,6 @@ class DioWrapper {
             error: true,
             compact: true,
             maxWidth: 90));
-    }
-
-    if (useTokenInterceptor) {
-      dio
-        ..interceptors
-            .add(TokenInterceptor(dio, auth0client));
     }
   }
 

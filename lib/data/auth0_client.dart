@@ -9,35 +9,29 @@ class Auth0Client {
   int connectTimeout;
   int sendTimeout;
   int receiveTimeout;
-  bool userTokenInterceptor = false;
-  bool userLoggerInterceptor = false;
+  bool useLoggerInterceptor = false;
 
-  Auth0Client({
-    this.clientId,
-    this.clientSecret,
-    this.domain,
-    String accessToken,
-    this.connectTimeout,
-    this.sendTimeout,
-    this.receiveTimeout,
-    this.userLoggerInterceptor,
-    this.userTokenInterceptor
-  }) {
+  Auth0Client(
+      {this.clientId,
+      this.clientSecret,
+      this.domain,
+      String accessToken,
+      this.connectTimeout,
+      this.sendTimeout,
+      this.receiveTimeout,
+      this.useLoggerInterceptor}) {
     assert(clientId != null);
     assert(domain != null);
 
-    dioWrapper.configure(
-        'https://$domain', connectTimeout, sendTimeout, receiveTimeout,
-        accessToken, this,
-        useLoggerInterceptor: userLoggerInterceptor,
-        useTokenInterceptor: userTokenInterceptor);
+    dioWrapper.configure('https://$domain', connectTimeout, sendTimeout,
+        receiveTimeout, accessToken, this,
+        useLoggerInterceptor: useLoggerInterceptor);
   }
 
   /// Updates current access token for Auth0 connection
   void updateToken(String newAccessToken) {
-    dioWrapper.configure(
-        'https://$domain', connectTimeout, sendTimeout, receiveTimeout,
-        newAccessToken, this);
+    dioWrapper.configure('https://$domain', connectTimeout, sendTimeout,
+        receiveTimeout, newAccessToken, this);
   }
 
   /// Builds the full authorize endpoint url in the Authorization Server (AS) with given parameters.
@@ -60,8 +54,7 @@ class Auth0Client {
       });
     return dioWrapper.url(
       '/authorize',
-      query: Map.from({'client_id': this.clientId})
-        ..addAll(query),
+      query: Map.from({'client_id': this.clientId})..addAll(query),
       includeTelemetry: true,
     );
   }
@@ -150,8 +143,6 @@ class Auth0Client {
 
     Response res = await dioWrapper.post('/oauth/token', body: payload);
     Auth0User user = Auth0User.fromMap(res.data);
-    await Auth0PreferenceManager.singleton.setAccessToken(user.accessToken);
-    await Auth0PreferenceManager.singleton.setRefreshToken(user.refreshToken);
     return user;
   }
 
@@ -188,10 +179,9 @@ class Auth0Client {
   /// @returns [Future]
   Future<dynamic> resetPassword(dynamic params) async {
     assert(params['email'] != null && params['connection'] != null);
-    var payload = Map.from(params)
-      ..addAll({'client_id': this.clientId});
+    var payload = Map.from(params)..addAll({'client_id': this.clientId});
     var res =
-    await dioWrapper.post('/dbconnections/change_password', body: payload);
+        await dioWrapper.post('/dbconnections/change_password', body: payload);
     return res.data;
   }
 
@@ -209,8 +199,7 @@ class Auth0Client {
           params['password'] != null &&
           params['connection'] != null);
     } else {}
-    var payload = Map.from(params)
-      ..addAll({'client_id': this.clientId});
+    var payload = Map.from(params)..addAll({'client_id': this.clientId});
     if (params['metadata'] != null)
       payload..addAll({'user_metadata': params['metadata']});
     var res = await dioWrapper.post(
