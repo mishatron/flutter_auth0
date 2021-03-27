@@ -64,7 +64,7 @@ class DioWrapper {
 
   /// DIO POST
   /// take [url], concrete route
-  Future<Response> post(String url, {Map? headers, body, encoding}) async =>
+  Future<Response> post(String url, {body}) async =>
       await dio.post(url, data: body).then((response) {
         return response;
       }).catchError((error) {
