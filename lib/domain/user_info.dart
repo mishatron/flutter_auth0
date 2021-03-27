@@ -1,12 +1,12 @@
 part of auth0;
 
 class Auth0User {
-  String accessToken;
-  String refreshToken;
-  String idToken;
-  String scope;
-  DateTime expiresDate;
-  String tokenType;
+  final String accessToken;
+  final String refreshToken;
+  final String idToken;
+  final String scope;
+  final DateTime expiresDate;
+  final String tokenType;
 
   Auth0User.fromMap(Map snapshot)
       : accessToken = snapshot['access_token'],

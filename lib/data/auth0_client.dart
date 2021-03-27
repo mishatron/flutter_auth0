@@ -6,22 +6,20 @@ class Auth0Client {
   final String clientSecret;
   final String domain;
 
-  int connectTimeout;
-  int sendTimeout;
-  int receiveTimeout;
-  bool useLoggerInterceptor = false;
+  final int connectTimeout;
+  final int sendTimeout;
+  final int receiveTimeout;
+  final bool useLoggerInterceptor;
 
   Auth0Client(
-      {this.clientId,
-      this.clientSecret,
-      this.domain,
-      String accessToken,
-      this.connectTimeout,
-      this.sendTimeout,
-      this.receiveTimeout,
-      this.useLoggerInterceptor}) {
-    assert(clientId != null);
-    assert(domain != null);
+      {required this.clientId,
+      required this.clientSecret,
+      required this.domain,
+      required String accessToken,
+      required this.connectTimeout,
+      required this.sendTimeout,
+      required this.receiveTimeout,
+      this.useLoggerInterceptor = false}) {
 
     dioWrapper.configure('https://$domain', connectTimeout, sendTimeout,
         receiveTimeout, accessToken, this,
