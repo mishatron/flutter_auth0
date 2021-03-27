@@ -3,9 +3,9 @@ part of auth0;
 void handleError(DioError error, JsonDecoder _decoder) {
   if (error.error is SocketException)
     throw error.error;
-  else if (error.type == DioErrorType.RECEIVE_TIMEOUT ||
-      error.type == DioErrorType.SEND_TIMEOUT ||
-      error.type == DioErrorType.CONNECT_TIMEOUT) {
+  else if (error.type == DioErrorType.receiveTimeout ||
+      error.type == DioErrorType.sendTimeout ||
+      error.type == DioErrorType.connectTimeout) {
     throw SocketException(error.toString());
   } else {
     if (error.response != null) {
