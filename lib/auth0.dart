@@ -12,4 +12,4 @@ part 'data/network/exception_handler.dart';
 part 'domain/telemetry.dart';
 part 'domain/user_info.dart';
 part 'errors/auth0_unauthorized_exception.dart';
-part 'errors/auth_exeption.dart';
+part 'errors/auth_exception.dart';
