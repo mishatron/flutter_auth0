@@ -1,3 +1,7 @@
+## [2.0.0-nullsafety.0] - 31.03.2021.
+* Added nullsafety support, thanks @LockedThread
+
+
 ## [1.3.0] - 06.01.2021.
 * Removed useless shared preference and token interceptor
 * Removed flutter as dependency
