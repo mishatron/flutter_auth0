@@ -4,8 +4,8 @@ part of auth0;
 class DioWrapper {
   final Dio dio = Dio();
   final JsonDecoder _decoder = JsonDecoder();
-  String host = "";
-  String scheme = "";
+  late String host;
+  late String scheme;
 
   void configure(String baseUrl, int connectTimeout, int sendTimeout,
       int receiveTimeout, String accessToken, Auth0Client auth0client,
@@ -54,7 +54,7 @@ class DioWrapper {
 
   /// DIO GET
   /// take [url], concrete route
-  Future<Response> get(String url, {Map<String, dynamic> params}) async =>
+  Future<Response> get(String url, {Map<String, dynamic>? params}) async =>
       await dio
           .get(url, queryParameters: params)
           .then((response) => response)
@@ -64,7 +64,7 @@ class DioWrapper {
 
   /// DIO POST
   /// take [url], concrete route
-  Future<Response> post(String url, {Map headers, body, encoding}) async =>
+  Future<Response> post(String url, {body}) async =>
       await dio.post(url, data: body).then((response) {
         return response;
       }).catchError((error) {
