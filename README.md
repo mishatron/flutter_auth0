@@ -6,7 +6,8 @@ Dart package for authentication using Auth0 API.Contains basic set of methods li
 
 ```
 var client = Auth0Client(clientId: "abcdefg", clientSecret: "abcdefg", domain: "site.url"
-        connectTimeout: 10000, sendTimeout: 10000, receiveTimeout: 60000);
+        connectTimeout: 10000, sendTimeout: 10000, receiveTimeout: 60000,
+        useLoggerInterceptor: true, accessToken: "abcdefg");
 ```
 Domain should be without https, it is added automatically
 

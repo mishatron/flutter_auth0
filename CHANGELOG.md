@@ -1,3 +1,6 @@
+## [2.0.1] - 07.06.2021.
+* Updated dependencies and example
+
 ## [2.0.0-nullsafety.0] - 31.03.2021.
 * Added nullsafety support, thanks @LockedThread
 
