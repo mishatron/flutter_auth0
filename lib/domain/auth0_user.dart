@@ -1,12 +1,12 @@
 part of auth0;
 
 class Auth0User {
-  final String accessToken;
-  final String refreshToken;
-  final String idToken;
-  final String scope;
-  final DateTime expiresDate;
-  final String tokenType;
+  final String? accessToken;
+  final String? refreshToken;
+  final String? idToken;
+  final String? scope;
+  final DateTime? expiresDate;
+  final String? tokenType;
 
   Auth0User.fromMap(Map snapshot)
       : accessToken = snapshot['access_token'],
@@ -23,7 +23,7 @@ class Auth0User {
       'refresh_token': refreshToken,
       'id_token': idToken,
       'scope': scope,
-      'expires_in': expiresDate.difference(DateTime.now()).inSeconds,
+      'expires_in': expiresDate?.difference(DateTime.now()).inSeconds,
       'token_type': tokenType
     };
   }

@@ -1,3 +1,7 @@
+## [2.0.2] - 12.10.2021.
+* All fields in Auth0User are nullable
+* More documentation for classes
+
 ## [2.0.1] - 07.06.2021.
 * Updated dependencies and example
 

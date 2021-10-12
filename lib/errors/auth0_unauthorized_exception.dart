@@ -1,5 +1,6 @@
 part of auth0;
 
+/// Class that presents exception unauthorized exception from auth0
 class Auth0UnauthorizedException implements Exception {
   final String message;
 

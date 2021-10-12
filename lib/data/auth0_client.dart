@@ -1,7 +1,7 @@
 part of auth0;
 
 class Auth0Client {
-  final DioWrapper dioWrapper = DioWrapper();
+  final DioWrapper _dioWrapper = DioWrapper();
   final String clientId;
   final String clientSecret;
   final String domain;
@@ -20,15 +20,14 @@ class Auth0Client {
       required this.sendTimeout,
       required this.receiveTimeout,
       this.useLoggerInterceptor = false}) {
-
-    dioWrapper.configure('https://$domain', connectTimeout, sendTimeout,
+    _dioWrapper.configure('https://$domain', connectTimeout, sendTimeout,
         receiveTimeout, accessToken, this,
         useLoggerInterceptor: useLoggerInterceptor);
   }
 
   /// Updates current access token for Auth0 connection
   void updateToken(String newAccessToken) {
-    dioWrapper.configure('https://$domain', connectTimeout, sendTimeout,
+    _dioWrapper.configure('https://$domain', connectTimeout, sendTimeout,
         receiveTimeout, newAccessToken, this);
   }
 
@@ -50,7 +49,7 @@ class Auth0Client {
         'response_type': params['responseType'],
         'state': params['state'],
       });
-    return dioWrapper.url(
+    return _dioWrapper.url(
       '/authorize',
       query: Map.from({'client_id': this.clientId})..addAll(query),
       includeTelemetry: true,
@@ -78,7 +77,7 @@ class Auth0Client {
           : 'password'
     };
 
-    Response res = await dioWrapper.post('/oauth/token', body: payload);
+    Response res = await _dioWrapper.post('/oauth/token', body: payload);
     return Auth0User.fromMap(res.data as Map);
   }
 
@@ -102,7 +101,7 @@ class Auth0Client {
         'grant_type': 'http://auth0.com/oauth/grant-type/password-realm',
       });
 
-    Response res = await dioWrapper.post('/oauth/token', body: payload);
+    Response res = await _dioWrapper.post('/oauth/token', body: payload);
     return Auth0User.fromMap(res.data);
   }
 
@@ -121,7 +120,7 @@ class Auth0Client {
         "authParams": {"scope": "offline_access", "grant_type": "refresh_token"}
       });
 
-    await dioWrapper.post('/passwordless/start', body: payload);
+    await _dioWrapper.post('/passwordless/start', body: payload);
     return true;
   }
 
@@ -139,7 +138,7 @@ class Auth0Client {
         'grant_type': 'http://auth0.com/oauth/grant-type/passwordless/otp',
       });
 
-    Response res = await dioWrapper.post('/oauth/token', body: payload);
+    Response res = await _dioWrapper.post('/oauth/token', body: payload);
     Auth0User user = Auth0User.fromMap(res.data);
     return user;
   }
@@ -158,7 +157,7 @@ class Auth0Client {
         'client_id': this.clientId,
         'grant_type': 'refresh_token',
       });
-    var res = await dioWrapper.post('/oauth/token', body: payload);
+    var res = await _dioWrapper.post('/oauth/token', body: payload);
     return res.data;
   }
 
@@ -166,7 +165,7 @@ class Auth0Client {
   /// Param [String] token user's access token
   /// Returns [Future] with user info
   Future<dynamic> getUserInfo() async {
-    var res = await dioWrapper.get('/userinfo');
+    var res = await _dioWrapper.get('/userinfo');
     return res.data;
   }
 
@@ -179,7 +178,7 @@ class Auth0Client {
     assert(params['email'] != null && params['connection'] != null);
     var payload = Map.from(params)..addAll({'client_id': this.clientId});
     var res =
-        await dioWrapper.post('/dbconnections/change_password', body: payload);
+        await _dioWrapper.post('/dbconnections/change_password', body: payload);
     return res.data;
   }
 
@@ -200,7 +199,7 @@ class Auth0Client {
     var payload = Map.from(params)..addAll({'client_id': this.clientId});
     if (params['metadata'] != null)
       payload..addAll({'user_metadata': params['metadata']});
-    var res = await dioWrapper.post(
+    var res = await _dioWrapper.post(
       '/dbconnections/signup',
       body: payload,
     );
@@ -218,7 +217,7 @@ class Auth0Client {
         'token': params['refreshToken'],
         'client_id': this.clientId,
       });
-    var res = await dioWrapper.post('/oauth/revoke', body: payload);
+    var res = await _dioWrapper.post('/oauth/revoke', body: payload);
     return res.data;
   }
 
@@ -240,7 +239,7 @@ class Auth0Client {
         'client_id': this.clientId,
         'grant_type': 'authorization_code',
       });
-    var res = await dioWrapper.post('/oauth/token', body: payload);
+    var res = await _dioWrapper.post('/oauth/token', body: payload);
     return res.data;
   }
 
@@ -249,8 +248,8 @@ class Auth0Client {
   /// [ref link]: https://auth0.com/docs/api/authentication#logout
   Future<dynamic> logout() async {
     Map<String, dynamic> params = Map<String, dynamic>();
-    params['auth0Client'] = dioWrapper.encodedTelemetry();
-    var res = await dioWrapper.get('/v2/logout', params: params);
+    params['auth0Client'] = _dioWrapper.encodedTelemetry();
+    var res = await _dioWrapper.get('/v2/logout', params: params);
     return res.data;
   }
 }
