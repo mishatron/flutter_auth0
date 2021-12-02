@@ -107,16 +107,19 @@ class Auth0Client {
 
   /// Performs sending sms code on phone number
   /// [params] to send parameters
-  /// @param [String] params.phone_number user's phone number
+  /// [connectionType] connection type to use, possible values: "sms", "email", defaults to sms
+  /// [connectionType] send code type to use, possible: "code", "link", defaults to code
+  /// @param [String] params.phone_number user's phone number (if using phone)
+  /// @param [String] params.email user's email address (is using email)
   /// @returns a [Future] with [bool]
-  Future<bool> sendOtpCode(dynamic params) async {
-    assert(params['phone_number'] != null);
+  Future<bool> sendOtpCode(dynamic params, [String? connectionType, String? send]) async {
+    assert(params['phone_number'] != null || params['email'] != null);
 
     var payload = Map.from(params)
       ..addAll({
         'client_id': this.clientId,
-        'connection': "sms",
-        'send': "code",
+        'connection': connectionType ?? "sms",
+        'send': send ?? "code",
         "authParams": {"scope": "offline_access", "grant_type": "refresh_token"}
       });
 
@@ -126,15 +129,17 @@ class Auth0Client {
 
   /// Performs verification of phone number
   /// [params] to send parameters
-  /// @param [String] params.otp - code form sms or @param [String] params.username
+  /// [realm] realm for authentication, possible values: "sms", "email", defaults to sms
+  /// @param [String] params.otp - code form sms/email
+  /// @param [String] params.username - users phone is sms realm or email, if email realm is being used
   /// @returns a [Future] with [Auth0User]
-  Future<Auth0User> verifyPhoneWithOTP(dynamic params) async {
+  Future<Auth0User> verifyOTP(dynamic params, [String? realm]) async {
     assert(params['username'] != null && params['otp'] != null);
 
     var payload = Map.from(params)
       ..addAll({
         'client_id': this.clientId,
-        'realm': "sms",
+        'realm': realm ?? "sms",
         'grant_type': 'http://auth0.com/oauth/grant-type/passwordless/otp',
       });
 
