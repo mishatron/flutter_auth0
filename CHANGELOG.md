@@ -1,3 +1,7 @@
+## [2.0.3] - 02.12.2021.
+* Updated dependencies
+* Support "passwordless" via email as well as SMS (issue #6)
+
 ## [2.0.2] - 12.10.2021.
 * All fields in Auth0User are nullable
 * More documentation for classes
