@@ -1,4 +1,4 @@
-## [2.0.3] - 02.12.2021.
+## [2.1.0-beta1] - 02.12.2021.
 * Updated dependencies
 * Support "passwordless" via email as well as SMS (issue #6)
 
