@@ -248,6 +248,25 @@ class Auth0Client {
     return res.data;
   }
 
+  /// Exchanges a code obtained from Signin-with-Apple social login for the user's tokens
+  /// @param subjectToken the auth code token issued by Sign-in-with-Apple service
+  /// @param scope the scopes requested for the issued tokens. e.g. openid profile
+  /// @returns a [Future] with userInfo
+  /// [ref link]: https://auth0.com/docs/api-auth/grant/authorization-code-pkce
+  Future<Auth0User> exchangeAppleAuthCode({required String subjectToken, required String scope}) async {
+    var payload = {
+      'client_id': this.clientId,
+      'subject_token': subjectToken,
+      "scope": scope,
+      "grant_type": 'urn:ietf:params:oauth:grant-type:token-exchange',
+      "subject_token_type": 'http://auth0.com/oauth/token-type/apple-authz-code',
+    };
+    var res = await _dioWrapper.post('/oauth/token', body: payload);
+    Auth0User user = Auth0User.fromMap(res.data);
+    return user;
+  }
+
+
   /// Makes logout API call
   /// @returns a [Future]
   /// [ref link]: https://auth0.com/docs/api/authentication#logout
