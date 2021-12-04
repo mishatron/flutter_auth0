@@ -248,7 +248,7 @@ class Auth0Client {
     return res.data;
   }
 
-  /// Exchanges a code obtained from Signin-with-Apple social login for the user's tokens
+  /// Exchanges a code obtained from SignIn-with-Apple social login for the user's tokens
   /// @param subjectToken the auth code token issued by Sign-in-with-Apple service
   /// @param scope the scopes requested for the issued tokens. e.g. openid profile
   /// @returns a [Future] with userInfo

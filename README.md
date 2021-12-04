@@ -26,4 +26,5 @@ Domain should be without https, it is added automatically
 `revoke` - Revokes an issued refresh token  
 `exchange` - Exchanges a code obtained via /authorize (w/PKCE) for the user's tokens  
 `sendOtpCode` - Performs sending sms code on phone number  
-`verifyPhoneWithOTP` - Performs verification of phone number
+`verifyPhoneWithOTP` - Performs verification of phone number  
+`exchangeAppleAuthCode1 - Exchanges a code obtained from SignIn-with-Apple social login for the user's tokens

@@ -1,3 +1,7 @@
+## [2.1.1-beta1] - 04.12.2021.
+* Updated documentation
+* Added method exchangeAppleAuthCode (issue #9)
+
 ## [2.1.0-beta1] - 02.12.2021.
 * Updated dependencies
 * Support "passwordless" via email as well as SMS (issue #6)
