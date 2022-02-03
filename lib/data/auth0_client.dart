@@ -55,6 +55,7 @@ class Auth0Client {
   }
 
   /// Performs Auth with user credentials using the Password Realm Grant
+  /// [clientSecret] is a secret key from auth0 account.
   /// [params] to send realm parameters
   /// @param [String] params.username user's username or email
   /// @param [String] params.password user's password

@@ -1,3 +1,6 @@
+## [2.2.0-beta1] - 03.02.2022.
+* Removed secret from constructor, added it as passwordGrant arg (issue #12)
+
 ## [2.1.1-beta1] - 04.12.2021.
 * Updated documentation
 * Added method exchangeAppleAuthCode (issue #9)
