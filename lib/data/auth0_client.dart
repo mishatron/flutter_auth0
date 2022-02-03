@@ -3,7 +3,6 @@ part of auth0;
 class Auth0Client {
   final DioWrapper _dioWrapper = DioWrapper();
   final String clientId;
-  final String clientSecret;
   final String domain;
 
   final int connectTimeout;
@@ -13,7 +12,6 @@ class Auth0Client {
 
   Auth0Client(
       {required this.clientId,
-      required this.clientSecret,
       required this.domain,
       required String accessToken,
       required this.connectTimeout,
@@ -65,13 +63,14 @@ class Auth0Client {
   /// @param [String] - [params.scope] scopes requested for the issued tokens. e.g. openid profile
   /// @returns a [Future] with [Auth0User]
   /// [ref link]: https://auth0.com/docs/api-auth/grant/password#realm-support
-  Future<Auth0User> passwordGrant(Map<String, String> params) async {
+  Future<Auth0User> passwordGrant(
+      Map<String, String> params, String clientSecret) async {
     assert(params['username'] != null && params['password'] != null);
 
     var payload = {
       ...params,
       'client_id': this.clientId,
-      'client_secret': this.clientSecret,
+      'client_secret': clientSecret,
       'grant_type': params['realm'] != null
           ? 'http://auth0.com/oauth/grant-type/password-realm'
           : 'password'
@@ -112,7 +111,8 @@ class Auth0Client {
   /// @param [String] params.phone_number user's phone number (if using phone)
   /// @param [String] params.email user's email address (is using email)
   /// @returns a [Future] with [bool]
-  Future<bool> sendOtpCode(dynamic params, [String? connectionType, String? send]) async {
+  Future<bool> sendOtpCode(dynamic params,
+      [String? connectionType, String? send]) async {
     assert(params['phone_number'] != null || params['email'] != null);
 
     var payload = Map.from(params)
@@ -253,19 +253,20 @@ class Auth0Client {
   /// @param scope the scopes requested for the issued tokens. e.g. openid profile
   /// @returns a [Future] with userInfo
   /// [ref link]: https://auth0.com/docs/api-auth/grant/authorization-code-pkce
-  Future<Auth0User> exchangeAppleAuthCode({required String subjectToken, required String scope}) async {
+  Future<Auth0User> exchangeAppleAuthCode(
+      {required String subjectToken, required String scope}) async {
     var payload = {
       'client_id': this.clientId,
       'subject_token': subjectToken,
       "scope": scope,
       "grant_type": 'urn:ietf:params:oauth:grant-type:token-exchange',
-      "subject_token_type": 'http://auth0.com/oauth/token-type/apple-authz-code',
+      "subject_token_type":
+          'http://auth0.com/oauth/token-type/apple-authz-code',
     };
     var res = await _dioWrapper.post('/oauth/token', body: payload);
     Auth0User user = Auth0User.fromMap(res.data);
     return user;
   }
-
 
   /// Makes logout API call
   /// @returns a [Future]
