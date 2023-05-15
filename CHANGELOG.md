@@ -1,3 +1,6 @@
+## [2.2.1] - 15.05.2023.
+* Updated dio version and documentation
+
 ## [2.2.0-beta1] - 03.02.2022.
 * Removed secret from constructor, added it as passwordGrant arg (issue #12)
 

@@ -1,12 +1,12 @@
 # auth0
 
-Dart package for authentication using Auth0 API.Contains basic set of methods like passwordRealm, sentOtp, getUser, logout etc.
+Dart package for authentication using Auth0 API.Contains basic set of methods like passwordRealm, sendOtp, getUser, logout etc.
 
 ## Usage
 
 ```
-var client = Auth0Client(clientId: "abcdefg", domain: "site.url"
-        connectTimeout: 10000, sendTimeout: 10000, receiveTimeout: 60000,
+final Auth0Client client = Auth0Client(clientId: "abcdefg", domain: "site.url"
+        connectTimeout: const Duration(seconds:10), sendTimeout: const Duration(seconds:10), receiveTimeout: const Duration(seconds:60),
         useLoggerInterceptor: true, accessToken: "abcdefg");
 ```
 Domain should be without https, it is added automatically
@@ -27,4 +27,4 @@ Domain should be without https, it is added automatically
 `exchange` - Exchanges a code obtained via /authorize (w/PKCE) for the user's tokens  
 `sendOtpCode` - Performs sending sms code on phone number  
 `verifyPhoneWithOTP` - Performs verification of phone number  
-`exchangeAppleAuthCode1 - Exchanges a code obtained from SignIn-with-Apple social login for the user's tokens
+`exchangeAppleAuthCode1` - Exchanges a code obtained from SignIn-with-Apple social login for the user's tokens

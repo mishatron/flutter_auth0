@@ -7,8 +7,8 @@ class DioWrapper {
   late String host;
   late String scheme;
 
-  void configure(String baseUrl, int connectTimeout, int sendTimeout,
-      int receiveTimeout, String accessToken, Auth0Client auth0client,
+  void configure(String baseUrl, Duration connectTimeout, Duration sendTimeout,
+      Duration receiveTimeout, String accessToken, Auth0Client auth0client,
       {bool useLoggerInterceptor = false}) {
     var parsed = Uri.parse(baseUrl);
     scheme = parsed.scheme;
